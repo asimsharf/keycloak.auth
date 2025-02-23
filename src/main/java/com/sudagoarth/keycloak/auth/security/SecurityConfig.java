@@ -7,8 +7,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestTemplate;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sudagoarth.keycloak.auth.exception.ApiAuthentication;
+import com.sudagoarth.keycloak.auth.ApiAuthentication;
 
 @Configuration
 public class SecurityConfig {
@@ -22,6 +24,11 @@ public class SecurityConfig {
         }
 
         @Bean
+        public RestTemplate restTemplate() {
+        return new RestTemplate();
+        }
+
+        @Bean
         public ApiAuthentication apiAuthentication() {
                 return new ApiAuthentication(new ObjectMapper());
         }
@@ -30,6 +37,7 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
                 return httpSecurity.csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(authorize -> authorize
+                                .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                                                 .anyRequest().authenticated())
                                 .oauth2ResourceServer(oauth2 -> oauth2
                                                 .jwt(jwt -> jwt.decoder(jwtDecoder())))

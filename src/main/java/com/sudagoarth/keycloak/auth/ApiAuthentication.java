@@ -1,4 +1,4 @@
-package com.sudagoarth.keycloak.auth.exception;
+package com.sudagoarth.keycloak.auth;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

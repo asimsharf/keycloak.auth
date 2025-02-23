@@ -1,4 +1,4 @@
-package com.sudagoarth.keycloak.auth.exception;
+package com.sudagoarth.keycloak.auth;
 
 
 public record ApiResponse(String message,  int status, Object data, String code,  boolean success, String errorDetails) {

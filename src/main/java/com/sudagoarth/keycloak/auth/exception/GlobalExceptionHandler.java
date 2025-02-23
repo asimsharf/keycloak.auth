@@ -6,6 +6,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.sudagoarth.keycloak.auth.ApiResponse;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
