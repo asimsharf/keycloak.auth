@@ -1,9 +1,13 @@
 package com.sudagoarth.keycloak.auth;
 
+import java.util.List;
+
+import org.springframework.validation.FieldError;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ApiResponse( String message, int status, Object data, String code, boolean success, String errorDetails) {
+public record ApiResponse( String message, int status, Object data, String code, boolean success, List<FieldError> errorDetails) {
 
     // Constructor to create success response
     public static ApiResponse success(String message, Object data) {
@@ -11,8 +15,8 @@ public record ApiResponse( String message, int status, Object data, String code,
     }
 
     // Constructor to create error response
-    public static ApiResponse error(String message, String code, String errorDetails) {
-        return new ApiResponse(message, 500, null, code, false, errorDetails);
+    public static ApiResponse error(String message, String code, List<FieldError> errorDetails) {
+        return new ApiResponse(message, 400, null, code, false, errorDetails);
     }
 
     // Builder pattern for flexibility
@@ -27,7 +31,7 @@ public record ApiResponse( String message, int status, Object data, String code,
         private Object data;
         private String code;
         private boolean success;
-        private String errorDetails;
+        private List<FieldError>  errorDetails;
 
         public ApiResponseBuilder message(String message) {
             this.message = message;
@@ -54,7 +58,7 @@ public record ApiResponse( String message, int status, Object data, String code,
             return this;
         }
 
-        public ApiResponseBuilder errorDetails(String errorDetails) {
+        public ApiResponseBuilder errorDetails(List<FieldError> errorDetails) {
             this.errorDetails = errorDetails;
             return this;
         }

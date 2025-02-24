@@ -91,4 +91,12 @@ public Optional<Map<String, Object>> loginUser(String username, String password)
     return Optional.empty();
 }
 
+public boolean isUsernameTaken(String username) {
+    return userRepository.findByUsername(username).isPresent();
+}
+
+public boolean isEmailTaken(String email) {
+    return userRepository.findByEmail(email).isPresent();
+}
+
 }

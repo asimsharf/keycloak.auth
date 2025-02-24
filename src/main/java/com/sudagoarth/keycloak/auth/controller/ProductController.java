@@ -28,7 +28,7 @@ public class ProductController {
         if (isProductExists) {
             // Return 409 Conflict with meaningful error message
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.error("Product already exists", "DUPLICATE_PRODUCT", "The product with this name already exists."));
+                    .body(ApiResponse.error("Product already exists", "DUPLICATE_PRODUCT", null));
         }
     
         try {
@@ -41,7 +41,7 @@ public class ProductController {
         } catch (Exception e) {
             // Handle unexpected errors gracefully
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error("Internal server error", "SERVER_ERROR", "An error occurred while creating the product."));
+                    .body(ApiResponse.error("Internal server error", "SERVER_ERROR", null));
         }
     }
     

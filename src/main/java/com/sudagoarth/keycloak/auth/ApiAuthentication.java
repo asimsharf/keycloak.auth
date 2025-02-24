@@ -41,13 +41,10 @@ public class ApiAuthentication implements AuthenticationEntryPoint {
         // Log the authentication failure
         logger.error("Authentication failed: {}", errorDetails);
 
-        // Create the ApiResponse
-        ApiResponse apiResponse = new ApiResponse(
-                message, status, null, code, false, errorDetails);
 
         // Send the response
         response.setStatus(status);
         response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+        response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.error(message, code, null)));
     }
 }

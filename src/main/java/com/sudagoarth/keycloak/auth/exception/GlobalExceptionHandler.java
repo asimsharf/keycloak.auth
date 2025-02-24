@@ -13,13 +13,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handleGeneralException(Exception ex) {
-        ApiResponse apiResponse = ApiResponse.error("An unexpected error occurred", "INTERNAL_SERVER_ERROR", ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error("An error occurred while processing the request", "INTERNAL_SERVER_ERROR", null));
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiResponse> handleAuthenticationException(AuthenticationException ex) {
-        ApiResponse apiResponse = ApiResponse.error("Authentication failed", "UNAUTHORIZED", ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("Unauthorized access. Please check your authentication token.", "UNAUTHORIZED", null));
     }
 }
