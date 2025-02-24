@@ -39,6 +39,7 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(authorize -> authorize
                                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                                 .requestMatchers("/actuator/**").permitAll()
+                                .requestMatchers("/api/products/**").permitAll()
                                                 .anyRequest().authenticated())
                                 .oauth2ResourceServer(oauth2 -> oauth2
                                                 .jwt(jwt -> jwt.decoder(jwtDecoder())))
