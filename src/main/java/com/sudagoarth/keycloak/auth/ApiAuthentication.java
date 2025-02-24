@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sudagoarth.keycloak.auth.model.LocaledData;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +26,9 @@ public class ApiAuthentication implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException {
 
-        String message = "Unauthorized access. Please check your authentication token.";
+        LocaledData message  = new LocaledData();
+        message.setArabic( "الوصول غير مصرح به. يرجى التحقق من رمز المصادقة الخاص بك.");
+        message.setEnglish("Unauthorized access. Please check your authentication token.");
         String code = "UNAUTHORIZED";
         int status = HttpServletResponse.SC_UNAUTHORIZED;
         String errorDetails = authException.getMessage();

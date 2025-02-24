@@ -5,17 +5,18 @@ import java.util.List;
 import org.springframework.validation.FieldError;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.sudagoarth.keycloak.auth.model.LocaledData;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ApiResponse( String message, int status, Object data, String code, boolean success, List<FieldError> errorDetails) {
+public record ApiResponse(LocaledData message, int status, Object data, String code, boolean success, List<FieldError> errorDetails) {
 
     // Constructor to create success response
-    public static ApiResponse success(String message, Object data) {
+    public static ApiResponse success(LocaledData message, Object data) {
         return new ApiResponse(message, 200, data, "OK", true, null);
     }
 
     // Constructor to create error response
-    public static ApiResponse error(String message, String code, List<FieldError> errorDetails) {
+    public static ApiResponse error(LocaledData message, String code, List<FieldError> errorDetails) {
         return new ApiResponse(message, 400, null, code, false, errorDetails);
     }
 
@@ -26,14 +27,14 @@ public record ApiResponse( String message, int status, Object data, String code,
 
     // Inner builder class
     public static class ApiResponseBuilder {
-        private String message;
+        private LocaledData message;
         private int status;
         private Object data;
         private String code;
         private boolean success;
         private List<FieldError>  errorDetails;
 
-        public ApiResponseBuilder message(String message) {
+        public ApiResponseBuilder message(LocaledData message) {
             this.message = message;
             return this;
         }

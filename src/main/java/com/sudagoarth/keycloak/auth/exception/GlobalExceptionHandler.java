@@ -7,19 +7,26 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.sudagoarth.keycloak.auth.ApiResponse;
+import com.sudagoarth.keycloak.auth.model.LocaledData;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse> handleGeneralException(Exception ex) {
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error("An error occurred while processing the request", "INTERNAL_SERVER_ERROR", null));
+                .body(ApiResponse.error(new LocaledData(
+                        "An error occurred while processing the request",
+                        "حدث خطأ أثناء معالجة الطلب"), "INTERNAL_SERVER_ERROR", null));
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiResponse> handleAuthenticationException(AuthenticationException ex) {
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("Unauthorized access. Please check your authentication token.", "UNAUTHORIZED", null));
+                .body(ApiResponse.error(new LocaledData(
+                        "Unauthorized access. Please check your authentication token.",
+                        "الوصول غير مصرح به. يرجى التحقق من رمز المصادقة الخاص بك."), "UNAUTHORIZED", null));
     }
 }
