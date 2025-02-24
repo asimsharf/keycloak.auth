@@ -2,7 +2,6 @@ package com.sudagoarth.keycloak.auth.service;
 
 import java.util.Optional;
 
-import org.apache.james.mime4j.dom.datetime.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -81,13 +80,13 @@ public Optional<Map<String, Object>> loginUser(String username, String password)
             result.put("user", userOpt.get());
             result.put("access_token", accessToken);
             result.put("expires_at", expiresAt);
-            
+
             return Optional.of(result);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    } 
 
     return Optional.empty();
 }
