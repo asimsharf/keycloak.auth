@@ -23,7 +23,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> register(@RequestBody User user) {
-        return ResponseEntity.ok(new ApiResponse("User registered successfully", 0, userService.registerUser(user), null, false, null));
+        return ResponseEntity.ok(ApiResponse.success("User registered successfully", userService.registerUser(user)));
     }
 
     @PostMapping("/login")
@@ -31,7 +31,7 @@ public class AuthController {
         String username = credentials.get("username");
         String password = credentials.get("password");
         return userService.loginUser(username, password)
-                .map(data -> ResponseEntity.ok(new ApiResponse("User logged in successfully", 0, data, null, true, null)))
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Invalid credentials", 1, null, null, false, null)));
+                .map(data -> ResponseEntity.ok(ApiResponse.success("User logged in successfully", data)))
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Invalid credentials", "INVALID_CREDENTIALS", null)));
     }
 }
