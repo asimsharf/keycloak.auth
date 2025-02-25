@@ -1,11 +1,11 @@
-package com.sudagoarth.keycloak.auth;
+package com.sudagoarth.keycloak.auth.util;
 
 import java.util.List;
 
 import org.springframework.validation.FieldError;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.sudagoarth.keycloak.auth.model.LocaledData;
+import com.sudagoarth.keycloak.auth.models.LocaledData;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ApiResponse(LocaledData message, int status, Object data, String code, boolean success, List<FieldError> errorDetails) {

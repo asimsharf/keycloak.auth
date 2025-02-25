@@ -3,7 +3,7 @@ package com.sudagoarth.keycloak.auth.interfaces;
 import java.util.List;
 import java.util.Optional;
 
-import com.sudagoarth.keycloak.auth.model.Product;
+import com.sudagoarth.keycloak.auth.models.Product;
 
 public interface ProductInterface {
     Product createProduct(Product product);

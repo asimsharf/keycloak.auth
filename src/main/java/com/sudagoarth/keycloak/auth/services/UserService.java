@@ -1,4 +1,4 @@
-package com.sudagoarth.keycloak.auth.service;
+package com.sudagoarth.keycloak.auth.services;
 
 import java.util.Optional;
 
@@ -8,8 +8,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sudagoarth.keycloak.auth.model.User;
-import com.sudagoarth.keycloak.auth.repository.UserRepository;
+import com.sudagoarth.keycloak.auth.models.User;
+import com.sudagoarth.keycloak.auth.repositories.UserRepository;
 
 import java.util.HashMap;
 import java.util.Map;

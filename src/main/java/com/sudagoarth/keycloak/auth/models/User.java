@@ -1,4 +1,4 @@
-package com.sudagoarth.keycloak.auth.model;
+package com.sudagoarth.keycloak.auth.models;
 
 import jakarta.persistence.*;
 

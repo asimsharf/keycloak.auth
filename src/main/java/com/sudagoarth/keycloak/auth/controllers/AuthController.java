@@ -1,4 +1,4 @@
-package com.sudagoarth.keycloak.auth.controller;
+package com.sudagoarth.keycloak.auth.controllers;
 
 import java.util.Map;
 
@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sudagoarth.keycloak.auth.ApiResponse;
-import com.sudagoarth.keycloak.auth.model.LocaledData;
-import com.sudagoarth.keycloak.auth.model.User;
-import com.sudagoarth.keycloak.auth.service.UserService;
+import com.sudagoarth.keycloak.auth.models.LocaledData;
+import com.sudagoarth.keycloak.auth.models.User;
+import com.sudagoarth.keycloak.auth.services.UserService;
+import com.sudagoarth.keycloak.auth.util.ApiResponse;
 
 import jakarta.validation.Valid;
 

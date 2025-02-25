@@ -10,7 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sudagoarth.keycloak.auth.ApiAuthentication;
+import com.sudagoarth.keycloak.auth.util.ApiAuthentication;
 
 @Configuration
 public class SecurityConfig {

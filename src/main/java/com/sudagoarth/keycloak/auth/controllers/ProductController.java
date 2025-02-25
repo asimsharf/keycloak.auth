@@ -1,9 +1,9 @@
-package com.sudagoarth.keycloak.auth.controller;
+package com.sudagoarth.keycloak.auth.controllers;
 
-import com.sudagoarth.keycloak.auth.ApiResponse;
 import com.sudagoarth.keycloak.auth.interfaces.ProductInterface;
-import com.sudagoarth.keycloak.auth.model.LocaledData;
-import com.sudagoarth.keycloak.auth.model.Product;
+import com.sudagoarth.keycloak.auth.models.LocaledData;
+import com.sudagoarth.keycloak.auth.models.Product;
+import com.sudagoarth.keycloak.auth.util.ApiResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,11 +1,12 @@
-package com.sudagoarth.keycloak.auth.service;
+package com.sudagoarth.keycloak.auth.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sudagoarth.keycloak.auth.interfaces.ProductInterface;
-import com.sudagoarth.keycloak.auth.model.Product;
-import com.sudagoarth.keycloak.auth.repository.ProductRepository;
+import com.sudagoarth.keycloak.auth.models.Product;
+import com.sudagoarth.keycloak.auth.repositories.ProductRepository;
+
 import java.util.List;
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package com.sudagoarth.keycloak.auth.exception;
+package com.sudagoarth.keycloak.auth.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -6,8 +6,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.sudagoarth.keycloak.auth.ApiResponse;
-import com.sudagoarth.keycloak.auth.model.LocaledData;
+import com.sudagoarth.keycloak.auth.models.LocaledData;
+import com.sudagoarth.keycloak.auth.util.ApiResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
