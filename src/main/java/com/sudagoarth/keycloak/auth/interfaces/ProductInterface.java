@@ -11,7 +11,6 @@ public interface ProductInterface {
     Optional<Product> getProductById(Long id);
     Product updateProduct(Long id, Product product);
     void deleteProduct(Long id);
-    public List<Product> getProductsByPriceRange(double minPrice, double maxPrice);
-    public List<Product> searchProductsByName(String keyword);
-    
+    List<Product> findProductsByPriceRange(double minPrice, double maxPrice);
+    List<Product> searchProductsByName(String keyword);
 }

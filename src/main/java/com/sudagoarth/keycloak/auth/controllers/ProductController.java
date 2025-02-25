@@ -1,6 +1,6 @@
 package com.sudagoarth.keycloak.auth.controllers;
 
-import com.sudagoarth.keycloak.auth.DTO.ProductResponse;
+import com.sudagoarth.keycloak.auth.DataTransferObjects.ProductResponse;
 import com.sudagoarth.keycloak.auth.interfaces.ProductInterface;
 import com.sudagoarth.keycloak.auth.models.LocaledData;
 import com.sudagoarth.keycloak.auth.models.Product;
@@ -19,6 +19,8 @@ public class ProductController {
 
         @Autowired
         private ProductInterface productInterface;
+
+
 
         @PostMapping
         public ResponseEntity<ApiResponse> createProduct(@RequestBody Product product) {
@@ -58,7 +60,7 @@ public class ProductController {
         @GetMapping
         public ResponseEntity<ApiResponse> getAllProducts() {
             // Convert all Product entities to ProductResponse
-            List<ProductResponse> productDTOs = productInterface.getAllProducts()
+            List<ProductResponse> productResponse = productInterface.getAllProducts()
                     .stream()
                     .map(ProductResponse::fromEntity)
                     .toList();
@@ -66,7 +68,7 @@ public class ProductController {
             // Return the list with a success response
             return ResponseEntity.ok(ApiResponse.success(new LocaledData(
                     "Products retrieved successfully",
-                    "تم استرداد المنتجات بنجاح"), productDTOs));
+                    "تم استرداد المنتجات بنجاح"), productResponse));
         }
         
 
@@ -149,14 +151,14 @@ public class ProductController {
                                 "لا يمكن أن تكون الكلمة المفتاحية فارغة"), "INVALID_INPUT", null));
             }
         
-            List<ProductResponse> productDTOs = productInterface.searchProductsByName(keyword)
+            List<ProductResponse> productResponse = productInterface.searchProductsByName(keyword)
                     .stream()
                     .map(ProductResponse::fromEntity)
                     .toList();
         
             return ResponseEntity.ok(ApiResponse.success(new LocaledData(
                     "Products found",
-                    "تم العثور على المنتجات"), productDTOs));
+                    "تم العثور على المنتجات"), productResponse));
         }
         
         @GetMapping("/price-range")
@@ -168,14 +170,14 @@ public class ProductController {
                                 "نطاق السعر غير صالح"), "INVALID_PRICE_RANGE", null));
             }
         
-            List<ProductResponse> productDTOs = productInterface.getProductsByPriceRange(min, max)
+            List<ProductResponse> productResponse = productInterface.findProductsByPriceRange(min, max)
                     .stream()
                     .map(ProductResponse::fromEntity)
                     .toList();
         
             return ResponseEntity.ok(ApiResponse.success(new LocaledData(
                     "Products within price range",
-                    "المنتجات ضمن نطاق السعر"), productDTOs));
+                    "المنتجات ضمن نطاق السعر"), productResponse));
         }
         
 

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductService implements ProductInterface {
+public class ProductService implements ProductInterface  {
     @Autowired
     private ProductRepository productRepository;
 
@@ -54,10 +54,12 @@ public class ProductService implements ProductInterface {
         productRepository.deleteById(id);
     }
     
-    public List<Product> getProductsByPriceRange(double minPrice, double maxPrice) {
+    @Override
+    public List<Product> findProductsByPriceRange(double minPrice, double maxPrice) {
         return productRepository.findProductsByPriceRange(minPrice, maxPrice);
     }
 
+    @Override
     public List<Product> searchProductsByName(String keyword) {
         return productRepository.searchProductsByName(keyword);
     }

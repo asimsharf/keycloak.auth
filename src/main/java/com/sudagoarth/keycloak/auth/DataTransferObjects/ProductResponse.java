@@ -1,4 +1,4 @@
-package com.sudagoarth.keycloak.auth.DTO;
+package com.sudagoarth.keycloak.auth.DataTransferObjects;
 
 import com.sudagoarth.keycloak.auth.models.Product;
 

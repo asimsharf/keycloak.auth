@@ -1,4 +1,4 @@
-package com.sudagoarth.keycloak.auth.DTO;
+package com.sudagoarth.keycloak.auth.DataTransferObjects;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
