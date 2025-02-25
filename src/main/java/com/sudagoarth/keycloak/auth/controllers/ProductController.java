@@ -5,6 +5,8 @@ import com.sudagoarth.keycloak.auth.models.LocaledData;
 import com.sudagoarth.keycloak.auth.models.Product;
 import com.sudagoarth.keycloak.auth.util.ApiResponse;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,4 +92,21 @@ public class ProductController {
                         "تم حذف المنتج بنجاح"),
                 null));
     }
+
+    @GetMapping("/search")
+public ResponseEntity<ApiResponse> searchProducts(@RequestParam String keyword) {
+    List<Product> products = productInterface.searchProductsByName(keyword);
+    return ResponseEntity.ok(ApiResponse.success(new LocaledData(
+            "Products found",
+            "تم العثور على المنتجات"), products));
+}
+
+@GetMapping("/price-range")
+public ResponseEntity<ApiResponse> getProductsByPriceRange(@RequestParam double min, @RequestParam double max) {
+    List<Product> products = productInterface.getProductsByPriceRange(min, max);
+    return ResponseEntity.ok(ApiResponse.success(new LocaledData(
+            "Products within price range",
+            "المنتجات ضمن نطاق السعر"), products));
+}
+
 }

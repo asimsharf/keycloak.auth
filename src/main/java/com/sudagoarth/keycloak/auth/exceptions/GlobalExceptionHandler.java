@@ -29,4 +29,10 @@ public class GlobalExceptionHandler {
                         "Unauthorized access. Please check your authentication token.",
                         "الوصول غير مصرح به. يرجى التحقق من رمز المصادقة الخاص بك."), "UNAUTHORIZED", null));
     }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ApiResponse> handleProductNotFound(ProductNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(new LocaledData(ex.getMessage(), "المنتج غير موجود"), "NOT_FOUND", null));
+    }
 }
