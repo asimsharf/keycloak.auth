@@ -28,75 +28,77 @@ public class UserService {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${keycloak.token-uri}")
-    private String tokenUri;
+    @Value("${OAUTH2_TOKEN_URI}")
+    private String oAuth2TokenUri;
 
-    @Value("${keycloak.client-id}")
-    private String clientId;
+    @Value("${OAUTH2_CLIENT_ID}")
+    private String oAuth2ClientId;
 
-    @Value("${keycloak.client-secret}")
-    private String clientSecret;
+    @Value("${OAUTH2_CLIENT_SECRET}")
+    private String oAuth2ClientSecret;
+
+    @Value("${OAUTH2_GRANT_TYPE}")
+    private String oAuth2GrantType;
 
     public User registerUser(User user) {
         user.setEnabled(true);
         return userRepository.save(user);
     }
 
-public Optional<Map<String, Object>> loginUser(String username, String password) {
-    Optional<User> userOpt = userRepository.findByUsername(username)
-            .filter(user -> user.getPassword().equals(password)); // Use hashed passwords in real apps!
+    public Optional<Map<String, Object>> loginUser(String username, String password) {
+        Optional<User> userOpt = userRepository.findByUsername(username)
+                .filter(user -> user.getPassword().equals(password)); // Use hashed passwords in real apps!
 
-    if (userOpt.isPresent()) {
-        try {
-            // Set headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        if (userOpt.isPresent()) {
+            try {
+                // Set headers
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-            // Set form data
-            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-            formData.add("grant_type", "client_credentials");
-            formData.add("client_id", "spring-client-credentials-id");
-            formData.add("client_secret", "9mtG5y9zpsEu9GZ6jDFWOvin74AGVbCC");
+                // Set form data
+                MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+                formData.add("grant_type", oAuth2GrantType);
+                formData.add("client_id", oAuth2ClientId);
+                formData.add("client_secret", oAuth2ClientSecret);
 
-            // Create HttpEntity
-            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
+                // Create HttpEntity
+                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
 
-            // Call Keycloak token endpoint
-            ResponseEntity<String> response = restTemplate.exchange(
-                    "http://localhost:8181/realms/spring-microservices-security-realm/protocol/openid-connect/token",
-                    HttpMethod.POST,
-                    request,
-                    String.class
-            );
+                // Call Keycloak token endpoint
+                ResponseEntity<String> response = restTemplate.exchange(
+                        oAuth2TokenUri,
+                        HttpMethod.POST,
+                        request,
+                        String.class);
 
-            // Parse the access token from the response
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode tokenResponse = mapper.readTree(response.getBody());
-            String accessToken = tokenResponse.get("access_token").asText();
-            String expiresAt = tokenResponse.get("expires_in").asText();
+                // Parse the access token from the response
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode tokenResponse = mapper.readTree(response.getBody());
+                String accessToken = tokenResponse.get("access_token").asText();
+                String expiresAt = tokenResponse.get("expires_in").asText();
 
-            // Prepare user data and token to return
-            Map<String, Object> result = new HashMap<>();
-            result.put("user", userOpt.get());
-            result.put("access_token", accessToken);
-            result.put("expires_at", expiresAt);
+                // Prepare user data and token to return
+                Map<String, Object> result = new HashMap<>();
+                result.put("user", userOpt.get());
+                result.put("access_token", accessToken);
+                result.put("expires_at", expiresAt);
 
-            return Optional.of(result);
+                return Optional.of(result);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-    } 
 
-    return Optional.empty();
-}
+        return Optional.empty();
+    }
 
-public boolean isUsernameTaken(String username) {
-    return userRepository.findByUsername(username).isPresent();
-}
+    public boolean isUsernameTaken(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
 
-public boolean isEmailTaken(String email) {
-    return userRepository.findByEmail(email).isPresent();
-}
+    public boolean isEmailTaken(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
 
 }

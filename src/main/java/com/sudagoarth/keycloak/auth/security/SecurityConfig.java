@@ -15,7 +15,7 @@ import com.sudagoarth.keycloak.auth.util.ApiAuthentication;
 @Configuration
 public class SecurityConfig {
 
-        @Value("${keycloak.jwk-uri}")
+        @Value("${OAUTH2_JWK_URI}")
         private String jwkUri;
 
         @Bean
