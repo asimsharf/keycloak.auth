@@ -1,6 +1,9 @@
 package com.sudagoarth.keycloak.auth.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -8,10 +11,18 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @NotNull(message = "Username cannot be null")
+    @Size(min = 5, max = 20, message = "Username must be between 5 and 20 characters")
     private String username;
+
+    @Email(message = "Email should be valid")
+    @NotNull(message = "Email cannot be null")
     private String email;
+
+    @NotNull(message = "Password cannot be null")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
+
     private boolean enabled;
 
     public User() {

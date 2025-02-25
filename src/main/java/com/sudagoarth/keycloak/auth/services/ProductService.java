@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ProductService implements ProductInterface  {
+public class ProductService implements ProductInterface {
     @Autowired
     private ProductRepository productRepository;
 
@@ -30,6 +30,7 @@ public class ProductService implements ProductInterface  {
 
     @Override
     public List<Product> getAllProducts() {
+        logger.info("Fetching all products");
         return productRepository.findAll();
     }
 
@@ -41,6 +42,7 @@ public class ProductService implements ProductInterface  {
     @Transactional
     @Override
     public Product updateProduct(Long id, Product product) {
+        logger.info("Updating product with ID: {}", id);
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
         existingProduct.setName(product.getName());
@@ -51,11 +53,13 @@ public class ProductService implements ProductInterface  {
 
     @Override
     public void deleteProduct(Long id) {
+        logger.info("Deleting product with ID: {}", id);
         productRepository.deleteById(id);
     }
-    
+
     @Override
     public List<Product> findProductsByPriceRange(double minPrice, double maxPrice) {
+
         return productRepository.findProductsByPriceRange(minPrice, maxPrice);
     }
 

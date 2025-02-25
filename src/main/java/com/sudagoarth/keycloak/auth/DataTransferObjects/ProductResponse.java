@@ -9,7 +9,8 @@ public class ProductResponse {
     private double price;
 
     // Constructors
-    public ProductResponse() {}
+    public ProductResponse() {
+    }
 
     public ProductResponse(Long id, String name, String description, double price) {
         this.id = id;
@@ -24,8 +25,7 @@ public class ProductResponse {
                 product.getId(),
                 product.getName(),
                 product.getDescription(),
-                product.getPrice()
-        );
+                product.getPrice());
     }
 
     // Getters and Setters

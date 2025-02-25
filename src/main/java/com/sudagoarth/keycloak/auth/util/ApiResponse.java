@@ -8,7 +8,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sudagoarth.keycloak.auth.models.LocaledData;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ApiResponse(LocaledData message, int status, Object data, String code, boolean success, List<FieldError> errorDetails) {
+public record ApiResponse(LocaledData message, int status, Object data, String code, boolean success,
+        List<FieldError> errorDetails) {
 
     // Constructor to create success response
     public static ApiResponse success(LocaledData message, Object data) {
@@ -32,7 +33,7 @@ public record ApiResponse(LocaledData message, int status, Object data, String c
         private Object data;
         private String code;
         private boolean success;
-        private List<FieldError>  errorDetails;
+        private List<FieldError> errorDetails;
 
         public ApiResponseBuilder message(LocaledData message) {
             this.message = message;

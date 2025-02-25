@@ -26,8 +26,8 @@ public class ApiAuthentication implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException {
 
-        LocaledData message  = new LocaledData();
-        message.setArabic( "الوصول غير مصرح به. يرجى التحقق من رمز المصادقة الخاص بك.");
+        LocaledData message = new LocaledData();
+        message.setArabic("الوصول غير مصرح به. يرجى التحقق من رمز المصادقة الخاص بك.");
         message.setEnglish("Unauthorized access. Please check your authentication token.");
         String code = "UNAUTHORIZED";
         int status = HttpServletResponse.SC_UNAUTHORIZED;
@@ -43,7 +43,6 @@ public class ApiAuthentication implements AuthenticationEntryPoint {
 
         // Log the authentication failure
         logger.error("Authentication failed: {}", errorDetails);
-
 
         // Send the response
         response.setStatus(status);

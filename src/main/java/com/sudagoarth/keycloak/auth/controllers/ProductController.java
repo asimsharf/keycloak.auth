@@ -8,6 +8,8 @@ import com.sudagoarth.keycloak.auth.util.ApiResponse;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,7 @@ public class ProductController {
         @Autowired
         private ProductInterface productInterface;
 
-
+        private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
         @PostMapping
         public ResponseEntity<ApiResponse> createProduct(@RequestBody Product product) {
@@ -48,6 +50,7 @@ public class ProductController {
                                                         "تم إنشاء المنتج بنجاح"), createdProduct));
                 } catch (Exception e) {
                         // Handle unexpected errors gracefully
+                        logger.error("An error occurred while creating the product", e);
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                         .body(ApiResponse.error(
                                                         new LocaledData(
@@ -59,18 +62,17 @@ public class ProductController {
 
         @GetMapping
         public ResponseEntity<ApiResponse> getAllProducts() {
-            // Convert all Product entities to ProductResponse
-            List<ProductResponse> productResponse = productInterface.getAllProducts()
-                    .stream()
-                    .map(ProductResponse::fromEntity)
-                    .toList();
-        
-            // Return the list with a success response
-            return ResponseEntity.ok(ApiResponse.success(new LocaledData(
-                    "Products retrieved successfully",
-                    "تم استرداد المنتجات بنجاح"), productResponse));
+                // Convert all Product entities to ProductResponse
+                List<ProductResponse> productResponse = productInterface.getAllProducts()
+                                .stream()
+                                .map(ProductResponse::fromEntity)
+                                .toList();
+
+                // Return the list with a success response
+                return ResponseEntity.ok(ApiResponse.success(new LocaledData(
+                                "Products retrieved successfully",
+                                "تم استرداد المنتجات بنجاح"), productResponse));
         }
-        
 
         @GetMapping("/{id}")
         public ResponseEntity<ApiResponse> getProductById(@PathVariable Long id) {
@@ -144,41 +146,41 @@ public class ProductController {
 
         @GetMapping("/search")
         public ResponseEntity<ApiResponse> searchProducts(@RequestParam String keyword) {
-            if (keyword == null || keyword.trim().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(ApiResponse.error(new LocaledData(
-                                "Keyword cannot be empty",
-                                "لا يمكن أن تكون الكلمة المفتاحية فارغة"), "INVALID_INPUT", null));
-            }
-        
-            List<ProductResponse> productResponse = productInterface.searchProductsByName(keyword)
-                    .stream()
-                    .map(ProductResponse::fromEntity)
-                    .toList();
-        
-            return ResponseEntity.ok(ApiResponse.success(new LocaledData(
-                    "Products found",
-                    "تم العثور على المنتجات"), productResponse));
+                if (keyword == null || keyword.trim().isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body(ApiResponse.error(new LocaledData(
+                                                        "Keyword cannot be empty",
+                                                        "لا يمكن أن تكون الكلمة المفتاحية فارغة"), "INVALID_INPUT",
+                                                        null));
+                }
+
+                List<ProductResponse> productResponse = productInterface.searchProductsByName(keyword)
+                                .stream()
+                                .map(ProductResponse::fromEntity)
+                                .toList();
+
+                return ResponseEntity.ok(ApiResponse.success(new LocaledData(
+                                "Products found",
+                                "تم العثور على المنتجات"), productResponse));
         }
-        
+
         @GetMapping("/price-range")
         public ResponseEntity<ApiResponse> getProductsByPriceRange(@RequestParam double min, @RequestParam double max) {
-            if (min < 0 || max < 0 || min > max) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(ApiResponse.error(new LocaledData(
-                                "Invalid price range",
-                                "نطاق السعر غير صالح"), "INVALID_PRICE_RANGE", null));
-            }
-        
-            List<ProductResponse> productResponse = productInterface.findProductsByPriceRange(min, max)
-                    .stream()
-                    .map(ProductResponse::fromEntity)
-                    .toList();
-        
-            return ResponseEntity.ok(ApiResponse.success(new LocaledData(
-                    "Products within price range",
-                    "المنتجات ضمن نطاق السعر"), productResponse));
+                if (min < 0 || max < 0 || min > max) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body(ApiResponse.error(new LocaledData(
+                                                        "Invalid price range",
+                                                        "نطاق السعر غير صالح"), "INVALID_PRICE_RANGE", null));
+                }
+
+                List<ProductResponse> productResponse = productInterface.findProductsByPriceRange(min, max)
+                                .stream()
+                                .map(ProductResponse::fromEntity)
+                                .toList();
+
+                return ResponseEntity.ok(ApiResponse.success(new LocaledData(
+                                "Products within price range",
+                                "المنتجات ضمن نطاق السعر"), productResponse));
         }
-        
 
 }

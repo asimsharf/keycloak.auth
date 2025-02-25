@@ -2,6 +2,8 @@ package com.sudagoarth.keycloak.auth.services;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -17,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -24,6 +27,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -40,6 +46,11 @@ public class UserService {
     @Value("${OAUTH2_GRANT_TYPE}")
     private String oAuth2GrantType;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    @Value("${OAUTH2_EXPIRES_IN}")
+    private String expires_in;
+
     public User registerUser(User user) {
         user.setEnabled(true);
         return userRepository.save(user);
@@ -47,50 +58,84 @@ public class UserService {
 
     public Optional<Map<String, Object>> loginUser(String username, String password) {
         Optional<User> userOpt = userRepository.findByUsername(username)
-                .filter(user -> user.getPassword().equals(password)); // Use hashed passwords in real apps!
+                .filter(user -> passwordEncoder.matches(password, user.getPassword()));
 
         if (userOpt.isPresent()) {
             try {
-                // Set headers
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-                // Set form data
                 MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
                 formData.add("grant_type", oAuth2GrantType);
                 formData.add("client_id", oAuth2ClientId);
                 formData.add("client_secret", oAuth2ClientSecret);
 
-                // Create HttpEntity
-                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
+                Optional<Map<String, String>> tokenResponse = getAccessTokenFromKeycloak(formData);
 
-                // Call Keycloak token endpoint
-                ResponseEntity<String> response = restTemplate.exchange(
-                        oAuth2TokenUri,
-                        HttpMethod.POST,
-                        request,
-                        String.class);
+                // Check if the token response is missing
+                if (tokenResponse.isEmpty()) {
+                    logger.error("Failed to retrieve access token for user {}", username);
+                    return Optional.empty();
+                }
 
-                // Parse the access token from the response
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode tokenResponse = mapper.readTree(response.getBody());
-                String accessToken = tokenResponse.get("access_token").asText();
-                String expiresAt = tokenResponse.get("expires_in").asText();
-
-                // Prepare user data and token to return
                 Map<String, Object> result = new HashMap<>();
-                result.put("user", userOpt.get());
-                result.put("access_token", accessToken);
-                result.put("expires_at", expiresAt);
+                tokenResponse.ifPresent(tokenData -> {
+                    String accessToken = tokenData.get("access_token");
+                    String expiresAt = tokenData.get("expires_in");
+
+                    // Check if expected token fields are available
+                    if (accessToken == null || expiresAt == null) {
+                        logger.error("Access token or expiration missing for user {}", username);
+                        return;
+                    }
+
+                    result.put("user", userOpt.get());
+                    result.put("access_token", accessToken);
+                    result.put("expires_at", expiresAt);
+
+                });
 
                 return Optional.of(result);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                // Log the error in case of an exception
+                logger.error("Error occurred while logging in user {}: ", username, e);
             }
         }
 
+        // If no user found or password does not match, return empty Optional
+        logger.warn("Invalid login attempt for user {}", username);
         return Optional.empty();
+    }
+
+    private Optional<Map<String, String>> getAccessTokenFromKeycloak(MultiValueMap<String, String> formData)
+            throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                oAuth2TokenUri,
+                HttpMethod.POST,
+                request,
+                String.class);
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode tokenResponse = mapper.readTree(response.getBody());
+
+        if (tokenResponse.has("access_token") && tokenResponse.has("expires_in")) {
+            String accessToken = tokenResponse.get("access_token").asText();
+            String expiresAt = tokenResponse.get("expires_in").asText();
+
+            logger.info("Access token received: {}", accessToken);
+            logger.info("Token expires in: {} seconds", expiresAt);
+
+            Map<String, String> result = new HashMap<>();
+            result.put("access_token", accessToken);
+            result.put("expires_in", expiresAt); // storing expiration time
+
+            return Optional.of(result);
+        } else {
+            logger.error("Keycloak response missing required fields.");
+            return Optional.empty();
+        }
     }
 
     public boolean isUsernameTaken(String username) {
