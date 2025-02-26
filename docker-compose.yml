@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # MySQL Database for Keycloak
+  mysql-db:
+    container_name: mysql-db
+    image: mysql:latest
+    restart: always
+    volumes:
+      - ./volume-data/mysql_keycloak_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloakdb
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+    networks:
+      - keycloak-network
+    ports:
+      - "3306:3306"
+
+  # Keycloak Server
+  keycloak-server:
+    container_name: keycloak-server
+    image: quay.io/keycloak/keycloak:latest
+    restart: always
+    command: ["start-dev", "--import-realm"]
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql-db
+      DB_DATABASE: keycloakdb
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    networks:
+      - keycloak-network
+    ports:
+      - "8181:8080"
+    volumes:
+      - ./docker/keycloak/realms/:/opt/keycloak/data/import/
+      - ./volume-data/keycloak_data:/opt/keycloak/data
+    depends_on:
+      - mysql-db
+
+  # Spring Boot Authentication Service
+  keycloak-auth-service:
+    container_name: keycloak-auth-service
+    build: .
+    image: keycloak-auth-service
+    restart: always
+    networks:
+      - keycloak-network
+    ports:
+      - "4000:4000"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/keycloakdb
+      SPRING_DATASOURCE_USERNAME: keycloak
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak-server:8080/realms/auth-realm
+    depends_on:
+      - mysql-db
+      - keycloak-server
+
+  # PHPMyAdmin for MySQL management
+  phpmyadmin-ui:
+    container_name: phpmyadmin-ui
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    environment:
+      PMA_HOST: mysql-db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    networks:
+      - keycloak-network
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql-db
+
+networks:
+  keycloak-network:
+    driver: bridge
