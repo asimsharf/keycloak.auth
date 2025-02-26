@@ -12,13 +12,13 @@ public record ApiResponse(LocaledData message, int status, Object data, String c
         List<FieldError> errorDetails) {
 
     // Constructor to create success response
-    public static ApiResponse success(LocaledData message, Object data) {
-        return new ApiResponse(message, 200, data, "OK", true, null);
+    public static ApiResponse success(LocaledData message, int status, Object data) {
+        return new ApiResponse(message, status, data, "OK", true, null);
     }
 
     // Constructor to create error response
-    public static ApiResponse error(LocaledData message, String code, List<FieldError> errorDetails) {
-        return new ApiResponse(message, 400, null, code, false, errorDetails);
+    public static ApiResponse error(LocaledData message, int status, String code, List<FieldError> errorDetails) {
+        return new ApiResponse(message, status, null, code, false, errorDetails);
     }
 
     // Builder pattern for flexibility

@@ -40,6 +40,7 @@ public class ApiAuthentication implements AuthenticationEntryPoint {
         ApiResponse errorResponse = ApiResponse.error(new LocaledData(
                 "Unauthorized access. Please check your authentication token.",
                 "الوصول غير مصرح به. يرجى التحقق من رمز المصادقة الخاص بك."),
+                HttpServletResponse.SC_UNAUTHORIZED,
                 "UNAUTHORIZED", errors);
 
         String jsonResponse = objectMapper.writeValueAsString(errorResponse);

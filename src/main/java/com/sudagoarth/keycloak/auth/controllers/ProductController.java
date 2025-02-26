@@ -41,6 +41,7 @@ public class ProductController {
 
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                         .body(ApiResponse.error(new LocaledData("Validation failed", "فشل التحقق"),
+                                                        HttpStatus.BAD_REQUEST.value(),
                                                         "VALIDATION_FAILED", validationErrors));
                 }
 
@@ -50,6 +51,7 @@ public class ProductController {
                                         .body(ApiResponse.error(
                                                         new LocaledData("Product already exists",
                                                                         "المنتج موجود بالفعل"),
+                                                        HttpStatus.CONFLICT.value(),
                                                         "DUPLICATE_PRODUCT", null));
                 }
 
@@ -65,13 +67,16 @@ public class ProductController {
 
                         return ResponseEntity.status(HttpStatus.CREATED)
                                         .body(ApiResponse.success(new LocaledData("Product created successfully",
-                                                        "تم إنشاء المنتج بنجاح"), createdProduct));
+                                                        "تم إنشاء المنتج بنجاح"),
+                                                        HttpStatus.CREATED.value(),
+                                                        createdProduct));
                 } catch (Exception e) {
                         logger.error("An error occurred while creating the product", e);
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                         .body(ApiResponse.error(
                                                         new LocaledData("An error occurred while creating the product",
                                                                         "حدث خطأ أثناء إنشاء المنتج"),
+                                                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
                                                         "SERVER_ERROR", null));
                 }
         }
@@ -87,7 +92,9 @@ public class ProductController {
                 // Return the list with a success response
                 return ResponseEntity.ok(ApiResponse.success(new LocaledData(
                                 "Products retrieved successfully",
-                                "تم استرداد المنتجات بنجاح"), productResponse));
+                                "تم استرداد المنتجات بنجاح"),
+                                HttpStatus.OK.value(),
+                                productResponse));
         }
 
         @GetMapping("/{id}")
@@ -97,12 +104,16 @@ public class ProductController {
                 if (product == null) {
                         return ResponseEntity.ok(ApiResponse.error(new LocaledData(
                                         "Product not found",
-                                        "المنتج غير موجود"), "NOT_FOUND", null));
+                                        "المنتج غير موجود"),
+                                        HttpStatus.NOT_FOUND.value(),
+                                        "NOT_FOUND", null));
                 } else {
                         ProductResponse productResponse = ProductResponse.fromEntity(product);
                         return ResponseEntity.ok(ApiResponse.success(new LocaledData(
                                         "Product retrieved successfully",
-                                        "تم استرداد المنتج بنجاح"), productResponse));
+                                        "تم استرداد المنتج بنجاح"),
+                                        HttpStatus.OK.value(),
+                                        productResponse));
                 }
         }
 
@@ -116,6 +127,7 @@ public class ProductController {
                         List<FieldError> validationErrors = bindingResult.getFieldErrors();
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                         .body(ApiResponse.error(new LocaledData("Validation failed", "فشل التحقق"),
+                                                        HttpStatus.BAD_REQUEST.value(),
                                                         "VALIDATION_FAILED", validationErrors));
                 }
 
@@ -127,18 +139,22 @@ public class ProductController {
                         ProductResponse productResponse = ProductResponse.fromEntity(updatedProduct);
 
                         return ResponseEntity.ok(ApiResponse.success(new LocaledData(
-                                        "Product updated successfully", "تم تحديث المنتج بنجاح"), productResponse));
+                                        "Product updated successfully", "تم تحديث المنتج بنجاح"),
+                                        HttpStatus.OK.value(),
+                                        productResponse));
 
                 } catch (ProductNotFoundException e) {
                         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                         .body(ApiResponse.error(
                                                         new LocaledData("Product not found", "المنتج غير موجود"),
+                                                        HttpStatus.NOT_FOUND.value(),
                                                         "NOT_FOUND", null));
                 } catch (Exception e) {
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                         .body(ApiResponse.error(
                                                         new LocaledData("An error occurred while updating the product",
                                                                         "حدث خطأ أثناء تحديث المنتج"),
+                                                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
                                                         "SERVER_ERROR", null));
                 }
         }
@@ -152,19 +168,25 @@ public class ProductController {
                         // Return success response
                         return ResponseEntity.ok(ApiResponse.success(new LocaledData(
                                         "Product deleted successfully",
-                                        "تم حذف المنتج بنجاح"), null));
+                                        "تم حذف المنتج بنجاح"),
+                                        HttpStatus.OK.value(),
+                                        null));
                 } catch (RuntimeException e) {
                         // If product not found
                         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                                         ApiResponse.error(new LocaledData(
                                                         "Product not found",
-                                                        "المنتج غير موجود"), "NOT_FOUND", null));
+                                                        "المنتج غير موجود"),
+                                                        HttpStatus.NOT_FOUND.value(),
+                                                        "NOT_FOUND", null));
                 } catch (Exception e) {
                         // Handle other unexpected exceptions
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                                         ApiResponse.error(new LocaledData(
                                                         "An error occurred while deleting the product",
-                                                        "حدث خطأ أثناء حذف المنتج"), "SERVER_ERROR", null));
+                                                        "حدث خطأ أثناء حذف المنتج"),
+                                                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                                        "SERVER_ERROR", null));
                 }
         }
 
@@ -174,7 +196,9 @@ public class ProductController {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                         .body(ApiResponse.error(new LocaledData(
                                                         "Keyword cannot be empty",
-                                                        "لا يمكن أن تكون الكلمة المفتاحية فارغة"), "INVALID_INPUT",
+                                                        "لا يمكن أن تكون الكلمة المفتاحية فارغة"),
+                                                        HttpStatus.BAD_REQUEST.value(),
+                                                        "INVALID_INPUT",
                                                         null));
                 }
 
@@ -185,7 +209,9 @@ public class ProductController {
 
                 return ResponseEntity.ok(ApiResponse.success(new LocaledData(
                                 "Products found",
-                                "تم العثور على المنتجات"), productResponse));
+                                "تم العثور على المنتجات"),
+                                HttpStatus.OK.value(),
+                                productResponse));
         }
 
         @GetMapping("/price-range")
@@ -194,7 +220,9 @@ public class ProductController {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                         .body(ApiResponse.error(new LocaledData(
                                                         "Invalid price range",
-                                                        "نطاق السعر غير صالح"), "INVALID_PRICE_RANGE", null));
+                                                        "نطاق السعر غير صالح"),
+                                                        HttpStatus.BAD_REQUEST.value(),
+                                                        "INVALID_PRICE_RANGE", null));
                 }
 
                 List<ProductResponse> productResponse = productInterface.findProductsByPriceRange(min, max)
@@ -204,7 +232,9 @@ public class ProductController {
 
                 return ResponseEntity.ok(ApiResponse.success(new LocaledData(
                                 "Products within price range",
-                                "المنتجات ضمن نطاق السعر"), productResponse));
+                                "المنتجات ضمن نطاق السعر"),
+                                HttpStatus.OK.value(),
+                                productResponse));
         }
 
 }

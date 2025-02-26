@@ -43,6 +43,7 @@ public class AuthController {
 
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                         .body(ApiResponse.error(new LocaledData("Validation failed", "فشل التحقق"),
+                                                        HttpStatus.BAD_REQUEST.value(),
                                                         "VALIDATION_FAILED", validationErrors));
                 }
 
@@ -52,6 +53,7 @@ public class AuthController {
                                         .body(ApiResponse.error(
                                                         new LocaledData("Username already taken",
                                                                         "اسم المستخدم موجود بالفعل"),
+                                                        HttpStatus.BAD_REQUEST.value(),
                                                         "DUPLICATE_USERNAME", null));
                 }
 
@@ -60,6 +62,7 @@ public class AuthController {
                                         .body(ApiResponse.error(
                                                         new LocaledData("Email already taken",
                                                                         "البريد الإلكتروني موجود بالفعل"),
+                                                        HttpStatus.BAD_REQUEST.value(),
                                                         "DUPLICATE_EMAIL", null));
                 }
 
@@ -76,7 +79,9 @@ public class AuthController {
 
                 return ResponseEntity.status(HttpStatus.CREATED)
                                 .body(ApiResponse.success(new LocaledData("User registered successfully",
-                                                "تم تسجيل المستخدم بنجاح"), registeredUser));
+
+                                                "تم تسجيل المستخدم بنجاح"), HttpStatus.CREATED.value(),
+                                                registeredUser));
         }
 
         @PostMapping("/login")
@@ -89,6 +94,7 @@ public class AuthController {
                                         .body(ApiResponse.error(
                                                         new LocaledData("Missing credentials",
                                                                         "بيانات الاعتماد مفقودة"),
+                                                        HttpStatus.BAD_REQUEST.value(),
                                                         "MISSING_CREDENTIALS", null));
                 }
 
@@ -109,10 +115,12 @@ public class AuthController {
 
                         return ResponseEntity.ok(ApiResponse
                                         .success(new LocaledData("Login successful", "تم تسجيل الدخول بنجاح"),
+                                                        HttpStatus.OK.value(),
                                                         userResponse));
                 }).orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                                 .body(ApiResponse.error(
                                                 new LocaledData("Invalid credentials", "بيانات الاعتماد غير صالحة"),
+                                                HttpStatus.UNAUTHORIZED.value(),
                                                 "INVALID_CREDENTIALS", null)));
         }
 
