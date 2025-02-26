@@ -103,7 +103,8 @@ public class AuthController {
                 return loginResponse.map(response -> {
                         User user = (User) response.get("user");
                         String token = (String) response.get("access_token");
-                        String expiresAt = (String) response.get("expires_at");
+                        String expiresIn = (String) response.get("expires_in");
+                
 
                         UserResponse userResponse = new UserResponse(
                                         user.getId(),
@@ -111,7 +112,7 @@ public class AuthController {
                                         user.getEmail(),
                                         user.getPhone(),
                                         token,
-                                        expiresAt);
+                                        expiresIn);
 
                         return ResponseEntity.ok(ApiResponse
                                         .success(new LocaledData("Login successful", "تم تسجيل الدخول بنجاح"),

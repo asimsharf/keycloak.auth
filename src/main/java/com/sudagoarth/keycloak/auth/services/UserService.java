@@ -87,6 +87,11 @@ public class UserService implements UserInterface {
             tokenResponse.ifPresent(tokenData -> {
                 String accessToken = tokenData.get("access_token");
                 String expiresIn = tokenData.get("expires_in");
+                String refreshToken = tokenData.get("refresh_token");
+                String refreshExpiresIn = tokenData.get("refresh_expires_in");
+                String tokenType = tokenData.get("token_type");
+                String notBeforePolicy = tokenData.get("not_before_policy");
+                String scope = tokenData.get("scope");
 
                 if (accessToken == null || expiresIn == null) {
                     logger.error("Access token or expiration missing for user '{}'", username);
@@ -95,7 +100,12 @@ public class UserService implements UserInterface {
 
                 result.put("user", user);
                 result.put("access_token", accessToken);
-                result.put("expires_at", expiresIn);
+                result.put("expires_in", expiresIn);
+                result.put("refresh_token", refreshToken);
+                result.put("refresh_expires_in", refreshExpiresIn);
+                result.put("token_type", tokenType);
+                result.put("not_before_policy", notBeforePolicy);
+                result.put("scope", scope);
             });
 
             return Optional.of(result);
