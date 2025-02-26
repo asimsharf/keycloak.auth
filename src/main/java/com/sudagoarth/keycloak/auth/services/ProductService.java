@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sudagoarth.keycloak.auth.DataTransferObjects.product.ProductRequest;
 import com.sudagoarth.keycloak.auth.exceptions.products.ProductNotFoundException;
 import com.sudagoarth.keycloak.auth.interfaces.ProductInterface;
 import com.sudagoarth.keycloak.auth.models.Product;
@@ -41,7 +42,7 @@ public class ProductService implements ProductInterface {
 
     @Transactional
     @Override
-    public Product updateProduct(Long id, Product product) {
+    public Product updateProduct(Long id, ProductRequest product) {
         logger.info("Updating product with ID: {}", id);
         Product existingProduct = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not found"));
         existingProduct.setName(product.getName());
@@ -65,5 +66,10 @@ public class ProductService implements ProductInterface {
     @Override
     public List<Product> searchProductsByName(String keyword) {
         return productRepository.searchProductsByName(keyword);
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return productRepository.existsByName(name);
     }
 }

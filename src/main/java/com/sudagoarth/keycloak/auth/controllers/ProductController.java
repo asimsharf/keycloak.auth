@@ -1,10 +1,14 @@
 package com.sudagoarth.keycloak.auth.controllers;
 
-import com.sudagoarth.keycloak.auth.DataTransferObjects.ProductResponse;
+import com.sudagoarth.keycloak.auth.DataTransferObjects.product.ProductRequest;
+import com.sudagoarth.keycloak.auth.DataTransferObjects.product.ProductResponse;
+import com.sudagoarth.keycloak.auth.exceptions.products.ProductNotFoundException;
 import com.sudagoarth.keycloak.auth.interfaces.ProductInterface;
 import com.sudagoarth.keycloak.auth.models.LocaledData;
 import com.sudagoarth.keycloak.auth.models.Product;
 import com.sudagoarth.keycloak.auth.util.ApiResponse;
+
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -13,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,36 +31,46 @@ public class ProductController {
         private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
         @PostMapping
-        public ResponseEntity<ApiResponse> createProduct(@RequestBody Product product) {
+        public ResponseEntity<ApiResponse> createProduct(@RequestBody @Valid ProductRequest productRequest,
+                        BindingResult bindingResult) {
 
-                // Validate if the product already exists (by name or other unique property)
-                boolean isProductExists = productInterface.getAllProducts().stream()
-                                .anyMatch(p -> p.getName().equalsIgnoreCase(product.getName()));
+                // Handle validation errors properly
+                if (bindingResult.hasErrors()) {
 
-                if (isProductExists) {
-                        // Return 409 Conflict with meaningful error message
+                        List<FieldError> validationErrors = bindingResult.getFieldErrors();
+
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body(ApiResponse.error(new LocaledData("Validation failed", "فشل التحقق"),
+                                                        "VALIDATION_FAILED", validationErrors));
+                }
+
+                // Check if the product already exists
+                if (productInterface.existsByName(productRequest.getName())) {
                         return ResponseEntity.status(HttpStatus.CONFLICT)
-                                        .body(ApiResponse.error(new LocaledData(
-                                                        "Product already exists",
-                                                        "المنتج موجود بالفعل"), "DUPLICATE_PRODUCT", null));
+                                        .body(ApiResponse.error(
+                                                        new LocaledData("Product already exists",
+                                                                        "المنتج موجود بالفعل"),
+                                                        "DUPLICATE_PRODUCT", null));
                 }
 
                 try {
-                        // If the product doesn't exist, create it
+                        // Convert DTO to Product entity
+                        Product product = new Product();
+                        product.setName(productRequest.getName());
+                        product.setDescription(productRequest.getDescription());
+                        product.setPrice(productRequest.getPrice());
+
+                        // Create product
                         Product createdProduct = productInterface.createProduct(product);
 
-                        // Return 201 Created with the product data
                         return ResponseEntity.status(HttpStatus.CREATED)
-                                        .body(ApiResponse.success(new LocaledData(
-                                                        "Product created successfully",
+                                        .body(ApiResponse.success(new LocaledData("Product created successfully",
                                                         "تم إنشاء المنتج بنجاح"), createdProduct));
                 } catch (Exception e) {
-                        // Handle unexpected errors gracefully
                         logger.error("An error occurred while creating the product", e);
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                         .body(ApiResponse.error(
-                                                        new LocaledData(
-                                                                        "An error occurred while creating the product",
+                                                        new LocaledData("An error occurred while creating the product",
                                                                         "حدث خطأ أثناء إنشاء المنتج"),
                                                         "SERVER_ERROR", null));
                 }
@@ -90,34 +106,40 @@ public class ProductController {
                 }
         }
 
-        @PutMapping("/{id}")
-        public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id, @RequestBody Product updatedProduct) {
-                try {
-                        // Update product in the service layer and fetch the updated version
-                        Product product = productInterface.updateProduct(id, updatedProduct);
+@PutMapping("/{id}")
+public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id, 
+                                                 @RequestBody @Valid ProductRequest productRequest, 
+                                                 BindingResult bindingResult) {
+    
+    // Handle validation errors
+    if (bindingResult.hasErrors()) {
+        List<FieldError> validationErrors = bindingResult.getFieldErrors();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(new LocaledData("Validation failed", "فشل التحقق"),
+                        "VALIDATION_FAILED", validationErrors));
+    }
 
-                        // Convert the updated entity to a response DTO
-                        ProductResponse productResponse = ProductResponse.fromEntity(product);
+    try {
+        // Delegate update logic to the service layer
+        Product updatedProduct = productInterface.updateProduct(id, productRequest);
 
-                        // Return success response
-                        return ResponseEntity.ok(ApiResponse.success(new LocaledData(
-                                        "Product updated successfully",
-                                        "تم تحديث المنتج بنجاح"), productResponse));
+        // Convert entity to response DTO
+        ProductResponse productResponse = ProductResponse.fromEntity(updatedProduct);
 
-                } catch (RuntimeException e) {
-                        // If product not found or other errors occur
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                                        ApiResponse.error(new LocaledData(
-                                                        "Product not found",
-                                                        "المنتج غير موجود"), "NOT_FOUND", null));
-                } catch (Exception e) {
-                        // Handle other unexpected exceptions
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                                        ApiResponse.error(new LocaledData(
-                                                        "An error occurred while updating the product",
-                                                        "حدث خطأ أثناء تحديث المنتج"), "SERVER_ERROR", null));
-                }
-        }
+        return ResponseEntity.ok(ApiResponse.success(new LocaledData(
+                "Product updated successfully", "تم تحديث المنتج بنجاح"), productResponse));
+
+    } catch (ProductNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(new LocaledData("Product not found", "المنتج غير موجود"),
+                        "NOT_FOUND", null));
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(new LocaledData("An error occurred while updating the product",
+                        "حدث خطأ أثناء تحديث المنتج"), "SERVER_ERROR", null));
+    }
+}
+
 
         @DeleteMapping("/{id}")
         public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id) {

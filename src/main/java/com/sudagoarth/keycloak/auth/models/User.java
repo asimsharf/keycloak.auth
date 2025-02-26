@@ -19,6 +19,11 @@ public class User {
     @NotNull(message = "Email cannot be null")
     private String email;
 
+    @Column(name = "phone_number", unique = true, nullable = false, length = 10)
+    @NotNull(message = "Phone number cannot be null")
+    @Size(min = 10, max = 10, message = "Phone number must be 10 characters long")
+    private String phone;
+
     @NotNull(message = "Password cannot be null")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
@@ -28,9 +33,10 @@ public class User {
     public User() {
     }
 
-    public User(String username, String email, String password, boolean enabled) {
+    public User(String username, String email, String password,String phone, boolean enabled) {
         this.username = username;
         this.email = email;
+        this.phone = phone;
         this.password = password;
         this.enabled = enabled;
     }
@@ -67,6 +73,14 @@ public class User {
         this.email = email;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -81,6 +95,7 @@ public class User {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
                 ", password='" + password + '\'' +
                 ", enabled=" + enabled +
                 '}';
