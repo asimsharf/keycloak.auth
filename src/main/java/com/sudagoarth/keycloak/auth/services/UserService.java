@@ -49,9 +49,6 @@ public class UserService implements UserInterface {
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    @Value("${OAUTH2_EXPIRES_IN}")
-    private String expires_in;
-
     @Override
     public User registerUser(User user) {
         user.setEnabled(true);
@@ -89,16 +86,16 @@ public class UserService implements UserInterface {
             Map<String, Object> result = new HashMap<>();
             tokenResponse.ifPresent(tokenData -> {
                 String accessToken = tokenData.get("access_token");
-                String expiresAt = tokenData.get("expires_in");
+                String expiresIn = tokenData.get("expires_in");
 
-                if (accessToken == null || expiresAt == null) {
+                if (accessToken == null || expiresIn == null) {
                     logger.error("Access token or expiration missing for user '{}'", username);
                     return;
                 }
 
                 result.put("user", user);
                 result.put("access_token", accessToken);
-                result.put("expires_at", expiresAt);
+                result.put("expires_at", expiresIn);
             });
 
             return Optional.of(result);
@@ -126,14 +123,14 @@ public class UserService implements UserInterface {
 
         if (tokenResponse.has("access_token") && tokenResponse.has("expires_in")) {
             String accessToken = tokenResponse.get("access_token").asText();
-            String expiresAt = tokenResponse.get("expires_in").asText();
+            String expiresIn = tokenResponse.get("expires_in").asText();
 
             logger.info("Access token received: {}", accessToken);
-            logger.info("Token expires in: {} seconds", expiresAt);
+            logger.info("Token expires in: {} seconds", expiresIn);
 
             Map<String, String> result = new HashMap<>();
             result.put("access_token", accessToken);
-            result.put("expires_in", expiresAt); // storing expiration time
+            result.put("expires_in", expiresIn); // storing expiration time
 
             return Optional.of(result);
         } else {

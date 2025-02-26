@@ -6,20 +6,20 @@ public class UserResponse {
     private String username;
     private String email;
     private String phone;
-    private String token;
-    private String tokenExpirAt;
+    private String accessToken;
+    private String expiresIn;
 
     // Constructors
     public UserResponse() {
     }
 
-    public UserResponse(Long id, String username, String email, String phone, String token, String tokenExpirAt) {
+    public UserResponse(Long id, String username, String email, String phone, String accessToken, String expiresIn) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.phone = phone;
-        this.token = token;
-        this.tokenExpirAt = tokenExpirAt;
+        this.accessToken = accessToken;
+        this.expiresIn = expiresIn;
     }
 
     // Getters and Setters
@@ -56,18 +56,18 @@ public class UserResponse {
     }
 
     public String getToken() {
-        return token;
+        return accessToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
     public String getTokenExpirAt() {
-        return tokenExpirAt;
+        return expiresIn;
     }
 
-    public void setTokenExpirAt(String tokenExpirAt) {
-        this.tokenExpirAt = tokenExpirAt;
+    public void setTokenExpirAt(String expiresIn) {
+        this.expiresIn = expiresIn;
     }
 }
