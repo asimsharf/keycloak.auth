@@ -53,6 +53,9 @@ services:
       - keycloak-network
     ports:
       - "4000:4000"
+    volumes:
+      - ./src:/app/src  # Mount source code for live updates
+      - ./target:/app/target  # Mount compiled classes for reflection
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/keycloakdb
       SPRING_DATASOURCE_USERNAME: keycloak
