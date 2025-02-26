@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sudagoarth.keycloak.auth.exceptions.ProductNotFoundException;
+import com.sudagoarth.keycloak.auth.exceptions.products.ProductNotFoundException;
 import com.sudagoarth.keycloak.auth.interfaces.ProductInterface;
 import com.sudagoarth.keycloak.auth.models.Product;
 import com.sudagoarth.keycloak.auth.repositories.ProductRepository;
@@ -43,8 +43,7 @@ public class ProductService implements ProductInterface {
     @Override
     public Product updateProduct(Long id, Product product) {
         logger.info("Updating product with ID: {}", id);
-        Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
+        Product existingProduct = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not found"));
         existingProduct.setName(product.getName());
         existingProduct.setDescription(product.getDescription());
         existingProduct.setPrice(product.getPrice());

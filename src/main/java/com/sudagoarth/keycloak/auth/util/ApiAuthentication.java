@@ -39,6 +39,14 @@ public class ApiAuthentication implements AuthenticationEntryPoint {
             errorDetails = "Bearer token authentication failed";
         } else if (authException.getMessage().contains("Basic")) {
             errorDetails = "Basic authentication failed";
+        } else if (authException.getMessage().contains("OAuth")) {
+            errorDetails = "OAuth authentication failed";
+        } else if (authException.getMessage().contains("SAML")) {
+            errorDetails = "SAML authentication failed";
+        } else if (authException.getMessage().contains("CAS")) {
+            errorDetails = "CAS authentication failed";
+        } else if (authException.getMessage().contains("OpenID")) {
+            errorDetails = "OpenID authentication failed";
         }
 
         // Log the authentication failure
