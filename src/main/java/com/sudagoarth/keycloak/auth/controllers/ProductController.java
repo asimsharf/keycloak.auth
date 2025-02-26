@@ -106,40 +106,42 @@ public class ProductController {
                 }
         }
 
-@PutMapping("/{id}")
-public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id, 
-                                                 @RequestBody @Valid ProductRequest productRequest, 
-                                                 BindingResult bindingResult) {
-    
-    // Handle validation errors
-    if (bindingResult.hasErrors()) {
-        List<FieldError> validationErrors = bindingResult.getFieldErrors();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(new LocaledData("Validation failed", "فشل التحقق"),
-                        "VALIDATION_FAILED", validationErrors));
-    }
+        @PutMapping("/{id}")
+        public ResponseEntity<ApiResponse> updateProduct(@PathVariable Long id,
+                        @RequestBody @Valid ProductRequest productRequest,
+                        BindingResult bindingResult) {
 
-    try {
-        // Delegate update logic to the service layer
-        Product updatedProduct = productInterface.updateProduct(id, productRequest);
+                // Handle validation errors
+                if (bindingResult.hasErrors()) {
+                        List<FieldError> validationErrors = bindingResult.getFieldErrors();
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                        .body(ApiResponse.error(new LocaledData("Validation failed", "فشل التحقق"),
+                                                        "VALIDATION_FAILED", validationErrors));
+                }
 
-        // Convert entity to response DTO
-        ProductResponse productResponse = ProductResponse.fromEntity(updatedProduct);
+                try {
+                        // Delegate update logic to the service layer
+                        Product updatedProduct = productInterface.updateProduct(id, productRequest);
 
-        return ResponseEntity.ok(ApiResponse.success(new LocaledData(
-                "Product updated successfully", "تم تحديث المنتج بنجاح"), productResponse));
+                        // Convert entity to response DTO
+                        ProductResponse productResponse = ProductResponse.fromEntity(updatedProduct);
 
-    } catch (ProductNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error(new LocaledData("Product not found", "المنتج غير موجود"),
-                        "NOT_FOUND", null));
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(new LocaledData("An error occurred while updating the product",
-                        "حدث خطأ أثناء تحديث المنتج"), "SERVER_ERROR", null));
-    }
-}
+                        return ResponseEntity.ok(ApiResponse.success(new LocaledData(
+                                        "Product updated successfully", "تم تحديث المنتج بنجاح"), productResponse));
 
+                } catch (ProductNotFoundException e) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                        .body(ApiResponse.error(
+                                                        new LocaledData("Product not found", "المنتج غير موجود"),
+                                                        "NOT_FOUND", null));
+                } catch (Exception e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body(ApiResponse.error(
+                                                        new LocaledData("An error occurred while updating the product",
+                                                                        "حدث خطأ أثناء تحديث المنتج"),
+                                                        "SERVER_ERROR", null));
+                }
+        }
 
         @DeleteMapping("/{id}")
         public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id) {

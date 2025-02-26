@@ -59,5 +59,5 @@ public class ProductRequest {
                 ", price=" + price +
                 '}';
     }
-    
+
 }
