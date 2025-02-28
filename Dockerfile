@@ -4,6 +4,11 @@ FROM openjdk:21-slim AS build
 # Set the working directory for the build stage
 WORKDIR /app
 
+# Spring Boot Environment Variables
+ENV SPRING_DATASOURCE_URL=jdbc:mysql://mysql.railway.internal:3306/railway
+ENV SPRING_DATASOURCE_USERNAME=root
+ENV SPRING_DATASOURCE_PASSWORD=EJmYKEZheyOHjdCQvmuWbmZoNelLKZzv
+
 # Copy Maven files (pom.xml) to the container
 COPY pom.xml /app/pom.xml
 
