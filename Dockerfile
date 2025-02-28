@@ -1,42 +1,64 @@
-# Use a Java 21 base image for building the app
+server.port=4000
+spring.application.name=keycloak.auth
+spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
+spring.jackson.time-zone=UTC
+
+# Keycloak Configuration
+OAUTH2_SCOPE=openid
+OAUTH2_GRANT_TYPE=client_credentials
+OAUTH2_REALM=auth-realm
+OAUTH2_CLIENT_ID=auth-realm-client-id
+OAUTH2_CLIENT_SECRET=9yg4Lbqz2bLNHUjpye8IQ42b6vgm0JlO
+
+OAUTH2_TOKEN_URI=https://keycloak-production-f936.up.railway.app/realms/auth-realm/protocol/openid-connect/token
+OAUTH2_JWT_ISSUER_URI=https://keycloak-production-f936.up.railway.app/realms/auth-realm
+
+keycloak.auth-server-url=${OAUTH2_JWT_ISSUER_URI}
+keycloak.realm=${OAUTH2_REALM}
+keycloak.resource=${OAUTH2_CLIENT_ID}
+keycloak.credentials.secret=${OAUTH2_CLIENT_SECRET}
+keycloak.public-client=true
+
+# Spring Security OAuth2 Client
+spring.security.oauth2.client.registration.keycloak.client-id=${OAUTH2_CLIENT_ID}
+spring.security.oauth2.client.registration.keycloak.client-secret=${OAUTH2_CLIENT_SECRET}
+spring.security.oauth2.client.registration.keycloak.scope=${OAUTH2_SCOPE}
+spring.security.oauth2.client.provider.keycloak.token-uri=${OAUTH2_TOKEN_URI}
+spring.security.oauth2.resourceserver.jwt.issuer-uri=${OAUTH2_JWT_ISSUER_URI}
+
+# Hibernate Settings
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# Database Configuration
+spring.datasource.url=${MYSQL_PUBLIC_URL}
+spring.datasource.username=${MYSQLUSER}
+spring.datasource.password=${MYSQLPASSWORD}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# Logging Configuration
+logging.level.org.springframework=ERROR
+logging.level.org.springframework.web=DEBUG
+logging.level.com.sudagoarth=DEBUG
+logging.level.org.springframework.security=DEBUG
+
+# Actuator Endpoints
+management.endpoints.web.exposure.include=health,info
+management.endpoint.health.show-details=always
+info.app.name=${spring.application.name}
+info.app.version=0.0.1
+info.app.description=Keycloak Auth Service
+
+# Dockerfile
 FROM openjdk:21-slim AS build
-
-# Set the working directory for the build stage
 WORKDIR /app
-
-# Spring Boot Environment Variables
-ENV SPRING_DATASOURCE_URL=jdbc:mysql://mysql.railway.internal:3306/railway
-ENV SPRING_DATASOURCE_USERNAME=root
-ENV SPRING_DATASOURCE_PASSWORD=EJmYKEZheyOHjdCQvmuWbmZoNelLKZzv
-
-# Copy Maven files (pom.xml) to the container
-COPY pom.xml /app/pom.xml
-
-# Copy the source code to the container
+COPY pom.xml /app/
 COPY src /app/src
+RUN apt-get update && apt-get install -y maven && mvn clean install -DskipTests
 
-# Install Maven and dependencies, and build the app without tests
-RUN apt-get update && apt-get install -y maven
-RUN mvn clean install -DskipTests
-
-# Use a smaller JRE image with Java 21 to run the app
 FROM openjdk:21-slim
-
-# Set the working directory for the runtime image
 WORKDIR /app
-
-# Copy the final built JAR file from the build image
 COPY --from=build /app/target/keycloak.auth-0.0.1-SNAPSHOT.jar /app/app.jar
-
-# Copy the wait-for-it script and make it executable
-COPY wait-for-it.sh /app/wait-for-it.sh
-RUN chmod +x /app/wait-for-it.sh
-
-# Install curl for debugging
-RUN apt-get update && apt-get install -y curl
-
-# Expose the port the application will run on
 EXPOSE 4000
-
-# Command to run the Spring Boot application
-CMD ["/app/wait-for-it.sh", "mysql-db:3306", "--", "java", "-jar", "/app/app.jar"]
+CMD ["java", "-jar", "/app/app.jar"]
